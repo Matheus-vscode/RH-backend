@@ -9,11 +9,7 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
-// Rotas
 app.use("/employees", employeesRouter);
-app.use("/employees/away", awayRouter);
-
-// Teste
-app.get("/", (req, res) => res.json({ status: "Backend rodando!" }));
+app.use("/away", awayRouter);
 
 app.listen(PORT, () => console.log(`✅ Backend rodando na porta ${PORT}`));

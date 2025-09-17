@@ -2,27 +2,27 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../db");
 
-// Listar todos os afastamentos
+// Listar afastamentos
 router.get("/", async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM away");
     res.json(rows);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
 
-// Cadastrar afastamento
+// Registrar afastamento
 router.post("/", async (req, res) => {
-  const { employeeId, startDate, endDate, reason } = req.body;
+  const { empId, fromDate, toDate, reason } = req.body;
   try {
     const [result] = await pool.query(
-      "INSERT INTO away (employee_id, start_date, end_date, reason) VALUES (?, ?, ?, ?)",
-      [employeeId, startDate, endDate, reason]
+      "INSERT INTO away (empId, fromDate, toDate, reason) VALUES (?, ?, ?, ?)",
+      [empId, fromDate, toDate, reason]
     );
-    res.status(201).json({ id: result.insertId, employeeId, startDate, endDate, reason });
+    res.status(201).json({ id: result.insertId, empId, fromDate, toDate, reason });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -33,7 +33,7 @@ router.delete("/:id", async (req, res) => {
     await pool.query("DELETE FROM away WHERE id=?", [id]);
     res.json({ message: "Afastamento removido" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
 
