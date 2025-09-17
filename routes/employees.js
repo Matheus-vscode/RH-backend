@@ -5,7 +5,7 @@ const pool = require("../db");
 // Listar funcionários
 router.get("/", async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM employees");
+    const [rows] = await pool.query("SELECT * FROM funcionarios");
     res.json(rows);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -14,13 +14,13 @@ router.get("/", async (req, res) => {
 
 // Criar funcionário
 router.post("/", async (req, res) => {
-  const { name, cpf, role, dept, salary, adm } = req.body;
+  const { nome, cpf, cargo, departamento, salario, admissao } = req.body;
   try {
     const [result] = await pool.query(
-      "INSERT INTO employees (name, cpf, role, dept, salary, adm) VALUES (?, ?, ?, ?, ?, ?)",
-      [name, cpf, role, dept, salary, adm]
+      "INSERT INTO funcionarios (nome, cpf, cargo, departamento, salario, admissao) VALUES (?, ?, ?, ?, ?, ?)",
+      [nome, cpf, cargo, departamento, salario, admissao]
     );
-    res.status(201).json({ id: result.insertId, name, cpf, role, dept, salary, adm });
+    res.status(201).json({ id: result.insertId, nome, cpf, cargo, departamento, salario, admissao });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -29,23 +29,23 @@ router.post("/", async (req, res) => {
 // Editar funcionário
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
-  const { name, cpf, role, dept, salary, adm } = req.body;
+  const { nome, cpf, cargo, departamento, salario, admissao } = req.body;
   try {
     await pool.query(
-      "UPDATE employees SET name=?, cpf=?, role=?, dept=?, salary=?, adm=? WHERE id=?",
-      [name, cpf, role, dept, salary, adm, id]
+      "UPDATE funcionarios SET nome=?, cpf=?, cargo=?, departamento=?, salario=?, admissao=? WHERE id=?",
+      [nome, cpf, cargo, departamento, salario, admissao, id]
     );
-    res.json({ id, name, cpf, role, dept, salary, adm });
+    res.json({ id, nome, cpf, cargo, departamento, salario, admissao });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// Remover funcionário
+// Deletar funcionário
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.query("DELETE FROM employees WHERE id=?", [id]);
+    await pool.query("DELETE FROM funcionarios WHERE id=?", [id]);
     res.json({ message: "Funcionário removido" });
   } catch (err) {
     res.status(500).json({ message: err.message });
