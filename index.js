@@ -1,8 +1,9 @@
+// backend/index.js
 const express = require("express");
 const cors = require("cors");
-const pool = require("./db");
 const employeesRouter = require("./routes/employees");
 const awayRouter = require("./routes/away");
+const pool = require("./db");
 
 const app = express();
 const PORT = 3001;
@@ -10,10 +11,11 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
+// Rotas principais
 app.use("/employees", employeesRouter);
 app.use("/away", awayRouter);
 
-// Rota teste
+// Teste de conexão com o backend e banco
 app.get("/", async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT 1+1 AS result");
@@ -23,4 +25,7 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`✅ Backend rodando na porta ${PORT}`));
+// Iniciar servidor
+app.listen(PORT, () => {
+  console.log(`✅ Backend rodando na porta ${PORT}`);
+});
