@@ -12,15 +12,15 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Registrar afastamento
+// Criar afastamento
 router.post("/", async (req, res) => {
-  const { empId, fromDate, toDate, reason } = req.body;
+  const { employeeId, startDate, endDate, reason } = req.body;
   try {
     const [result] = await pool.query(
-      "INSERT INTO away (empId, fromDate, toDate, reason) VALUES (?, ?, ?, ?)",
-      [empId, fromDate, toDate, reason]
+      "INSERT INTO away (employeeId, startDate, endDate, reason) VALUES (?, ?, ?, ?)",
+      [employeeId, startDate, endDate, reason]
     );
-    res.status(201).json({ id: result.insertId, empId, fromDate, toDate, reason });
+    res.status(201).json({ id: result.insertId, employeeId, startDate, endDate, reason });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

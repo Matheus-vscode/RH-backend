@@ -41,12 +41,11 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// Deletar funcionário
+// Remover funcionário
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
     await pool.query("DELETE FROM employees WHERE id=?", [id]);
-    await pool.query("DELETE FROM away WHERE empId=?", [id]); // remove afastamentos
     res.json({ message: "Funcionário removido" });
   } catch (err) {
     res.status(500).json({ message: err.message });
