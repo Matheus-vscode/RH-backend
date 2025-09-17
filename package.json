@@ -15,6 +15,9 @@
     "mysql2": "^3.15.0"
   }
 
+//Para desenvolvimento (com reinício automático): npm run dev
+//Para rodar normalmente (sem nodemon): npm start
+
   "scripts": {
   "start": "node index.js",
   "dev": "nodemon index.js"
