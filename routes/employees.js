@@ -2,32 +2,59 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../db");
 
-// Rota para registrar um afastamento
-router.post("/add", async (req, res) => {
-    const { employeeId, startDate, endDate, reason } = req.body;
-    if (!employeeId || !startDate || !endDate || !reason) {
-        return res.status(400).json({ message: "Preencha todos os campos" });
-    }
+// Criar funcionário
+router.post("/", async (req, res) => {
+  const { name, cpf, role, dept, salary, adm } = req.body;
+  if (!name) return res.status(400).json({ message: "O nome é obrigatório" });
 
-    try {
-        const [result] = await pool.query(
-            "INSERT INTO away (employee_id, start_date, end_date, reason) VALUES (?, ?, ?, ?)",
-            [employeeId, startDate, endDate, reason]
-        );
-        res.status(201).json({ id: result.insertId, employeeId, startDate, endDate, reason });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
+  try {
+    const [result] = await pool.execute(
+      "INSERT INTO employees (name, cpf, role, dept, salary, adm) VALUES (?, ?, ?, ?, ?, ?)",
+      [name, cpf, role, dept, salary, adm]
+    );
+    res.status(201).json({ id: result.insertId, name, cpf, role, dept, salary, adm });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Rota para listar todos os afastamentos
+// Listar todos
 router.get("/", async (req, res) => {
-    try {
-        const [rows] = await pool.query("SELECT * FROM away");
-        res.json(rows);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
+  try {
+    const [rows] = await pool.execute("SELECT * FROM employees");
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Atualizar
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, cpf, role, dept, salary, adm } = req.body;
+
+  try {
+    await pool.execute(
+      "UPDATE employees SET name=?, cpf=?, role=?, dept=?, salary=?, adm=? WHERE id=?",
+      [name, cpf, role, dept, salary, adm, id]
+    );
+    res.json({ id, name, cpf, role, dept, salary, adm });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Remover
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    // Remove afastamentos do funcionário antes
+    await pool.execute("DELETE FROM away WHERE employee_id=?", [id]);
+    await pool.execute("DELETE FROM employees WHERE id=?", [id]);
+    res.json({ message: "Funcionário e afastamentos removidos", id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;
