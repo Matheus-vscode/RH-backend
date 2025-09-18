@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
+const { v4: uuidv4 } = require('uuid'); // gera ids únicos
 
 // Listar todos
 router.get('/', async (req, res) => {
@@ -11,12 +12,14 @@ router.get('/', async (req, res) => {
 
 // Criar funcionário
 router.post('/', async (req, res) => {
-  const { id, name, cpf, role, dept, salary, adm } = req.body;
+  const { name, cpf, role, dept, salary, adm } = req.body;
+  const id = uuidv4(); // gera id único
   await pool.query(
     'INSERT INTO employees (id, name, cpf, role, dept, salary, adm) VALUES (?, ?, ?, ?, ?, ?, ?)',
     [id, name, cpf, role, dept, salary, adm]
   );
-  res.status(201).json({ message: 'Funcionário criado!' });
+  // Retorna o funcionário criado
+  res.status(201).json({ id, name, cpf, role, dept, salary, adm });
 });
 
 // Atualizar funcionário
@@ -38,3 +41,4 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+ports = router;
