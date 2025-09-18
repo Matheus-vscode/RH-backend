@@ -10,9 +10,9 @@ app.use(express.json());
 
 // ================== Configuração do Banco ==================
 const sequelize = new Sequelize(
-  process.env.DB_NAME || 'rh',       // nome do banco
-  process.env.DB_USER || 'root',     // usuário do MySQL
-  process.env.DB_PASSWORD || '',     // senha do MySQL
+  process.env.DB_NAME || 'rh',
+  process.env.DB_USER || 'root',
+  process.env.DB_PASSWORD || '',
   {
     host: process.env.DB_HOST || 'localhost',
     dialect: 'mysql',
