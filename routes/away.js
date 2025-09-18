@@ -1,40 +1,29 @@
-const express = require("express");
+// backend/routes/away.js
+const express = require('express');
 const router = express.Router();
-const pool = require("../db");
+const pool = require('../config/db');
 
-// Listar afastamentos
-router.get("/", async (req, res) => {
-  try {
-    const [rows] = await pool.query("SELECT * FROM afastamentos");
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+// Listar todos afastamentos
+router.get('/', async (req, res) => {
+  const [rows] = await pool.query('SELECT * FROM away');
+  res.json(rows);
 });
 
-// Registrar afastamento
-router.post("/", async (req, res) => {
-  const { funcionarioId, dataInicio, dataFim, motivo } = req.body;
-  try {
-    const [result] = await pool.query(
-      "INSERT INTO afastamentos (funcionarioId, dataInicio, dataFim, motivo) VALUES (?, ?, ?, ?)",
-      [funcionarioId, dataInicio, dataFim, motivo]
-    );
-    res.status(201).json({ id: result.insertId, funcionarioId, dataInicio, dataFim, motivo });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+// Criar afastamento
+router.post('/', async (req, res) => {
+  const { id, empId, fromDate, toDate, reason } = req.body;
+  await pool.query(
+    'INSERT INTO away (id, empId, fromDate, toDate, reason) VALUES (?, ?, ?, ?, ?)',
+    [id, empId, fromDate, toDate, reason]
+  );
+  res.status(201).json({ message: 'Afastamento registrado!' });
 });
 
 // Remover afastamento
-router.delete("/:id", async (req, res) => {
+router.delete('/:id', async (req, res) => {
   const { id } = req.params;
-  try {
-    await pool.query("DELETE FROM afastamentos WHERE id=?", [id]);
-    res.json({ message: "Afastamento removido" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+  await pool.query('DELETE FROM away WHERE id=?', [id]);
+  res.json({ message: 'Afastamento removido!' });
 });
 
 module.exports = router;

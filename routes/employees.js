@@ -1,55 +1,40 @@
-const express = require("express");
+// backend/routes/employees.js
+const express = require('express');
 const router = express.Router();
-const pool = require("../db");
+const pool = require('../config/db');
 
-// Listar funcionários
-router.get("/", async (req, res) => {
-  try {
-    const [rows] = await pool.query("SELECT * FROM funcionarios");
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+// Listar todos
+router.get('/', async (req, res) => {
+  const [rows] = await pool.query('SELECT * FROM employees');
+  res.json(rows);
 });
 
 // Criar funcionário
-router.post("/", async (req, res) => {
-  const { nome, cpf, cargo, departamento, salario, admissao } = req.body;
-  try {
-    const [result] = await pool.query(
-      "INSERT INTO funcionarios (nome, cpf, cargo, departamento, salario, admissao) VALUES (?, ?, ?, ?, ?, ?)",
-      [nome, cpf, cargo, departamento, salario, admissao]
-    );
-    res.status(201).json({ id: result.insertId, nome, cpf, cargo, departamento, salario, admissao });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+router.post('/', async (req, res) => {
+  const { id, name, cpf, role, dept, salary, adm } = req.body;
+  await pool.query(
+    'INSERT INTO employees (id, name, cpf, role, dept, salary, adm) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [id, name, cpf, role, dept, salary, adm]
+  );
+  res.status(201).json({ message: 'Funcionário criado!' });
 });
 
-// Editar funcionário
-router.put("/:id", async (req, res) => {
+// Atualizar funcionário
+router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { nome, cpf, cargo, departamento, salario, admissao } = req.body;
-  try {
-    await pool.query(
-      "UPDATE funcionarios SET nome=?, cpf=?, cargo=?, departamento=?, salario=?, admissao=? WHERE id=?",
-      [nome, cpf, cargo, departamento, salario, admissao, id]
-    );
-    res.json({ id, nome, cpf, cargo, departamento, salario, admissao });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+  const { name, cpf, role, dept, salary, adm } = req.body;
+  await pool.query(
+    'UPDATE employees SET name=?, cpf=?, role=?, dept=?, salary=?, adm=? WHERE id=?',
+    [name, cpf, role, dept, salary, adm, id]
+  );
+  res.json({ message: 'Funcionário atualizado!' });
 });
 
-// Deletar funcionário
-router.delete("/:id", async (req, res) => {
+// Remover funcionário
+router.delete('/:id', async (req, res) => {
   const { id } = req.params;
-  try {
-    await pool.query("DELETE FROM funcionarios WHERE id=?", [id]);
-    res.json({ message: "Funcionário removido" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+  await pool.query('DELETE FROM employees WHERE id=?', [id]);
+  res.json({ message: 'Funcionário removido!' });
 });
 
 module.exports = router;
