@@ -9,7 +9,7 @@ app.use(express.json());
 const db = await mysql.createPool({
   host: "localhost",
   user: "root",
-  password: "SUA_SENHA_AQUI", // coloque sua senha do MySQL
+  password: "1012Matheus2007", // coloque sua senha do MySQL
   database: "rh"
 });
 
