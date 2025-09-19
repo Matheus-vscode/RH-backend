@@ -10,7 +10,7 @@ app.use(express.json());
 const db = await mysql.createConnection({
   host: "localhost",
   user: "root",      // coloque seu usuário do MySQL
-  password: "",      // coloque sua senha do MySQL
+  password: "1012Matheus2007",      // coloque sua senha do MySQL
   database: "rh"     // crie um banco chamado 'rh'
 });
 console.log("✅ Conectado ao MySQL");

@@ -1,5 +1,5 @@
 {
-  "name": "rh-backend",
+  "name": "rh",
   "version": "1.0.0",
   "description": "Backend do sistema de RH",
   "main": "index.js",
