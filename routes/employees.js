@@ -1,25 +1,27 @@
 import express from "express";
 import { db } from "../db.js";
+import { randomUUID } from "crypto";
 
 const router = express.Router();
 
-// listar
+// Listar todos os funcionários
 router.get("/", async (req, res) => {
   const [rows] = await db.query("SELECT * FROM employees");
   res.json(rows);
 });
 
-// criar
+// Criar funcionário
 router.post("/", async (req, res) => {
   const { name, cpf, role, dept, salary, adm } = req.body;
-  const [result] = await db.query(
-    "INSERT INTO employees (name, cpf, role, dept, salary, adm) VALUES (?, ?, ?, ?, ?, ?)",
-    [name, cpf, role, dept, salary, adm]
+  const id = randomUUID();
+  await db.query(
+    "INSERT INTO employees (id, name, cpf, role, dept, salary, adm) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    [id, name, cpf, role, dept, salary, adm]
   );
-  res.json({ id: result.insertId, name, cpf, role, dept, salary, adm });
+  res.json({ id, name, cpf, role, dept, salary, adm });
 });
 
-// atualizar
+// Atualizar funcionário
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { name, cpf, role, dept, salary, adm } = req.body;
@@ -30,11 +32,14 @@ router.put("/:id", async (req, res) => {
   res.json({ id, name, cpf, role, dept, salary, adm });
 });
 
-// deletar
+// Remover funcionário
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   await db.query("DELETE FROM employees WHERE id=?", [id]);
+  // Remover afastamentos também
+  await db.query("DELETE FROM away WHERE empId=?", [id]);
   res.json({ success: true });
 });
 
 export default router;
+
