@@ -10,10 +10,10 @@ router.get("/", async (req, res) => {
   res.json(rows);
 });
 
-// Criar funcionário
+// Criar funcionário (ID gerado no backend)
 router.post("/", async (req, res) => {
   const { name, cpf, role, dept, salary, adm } = req.body;
-  const id = randomUUID();
+  const id = randomUUID(); // gera ID único
   await db.query(
     "INSERT INTO employees (id, name, cpf, role, dept, salary, adm) VALUES (?, ?, ?, ?, ?, ?, ?)",
     [id, name, cpf, role, dept, salary, adm]
