@@ -1,49 +1,61 @@
-// routes/employees.js
 const express = require("express");
 const router = express.Router();
-const db = require("../db");
+const pool = require("./db");
 
 // Listar todos os funcionários
-router.get("/", (req, res) => {
-  db.query("SELECT * FROM employees", (err, results) => {
-    if (err) return res.status(500).json({ error: err });
-    res.json(results);
-  });
+router.get("/", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT f.id, f.nome, f.cpf, c.nome AS cargo, d.nome AS dept FROM funcionarios f LEFT JOIN cargos c ON f.cargo_id=c.id LEFT JOIN departamentos d ON c.departamento_id=d.id");
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao buscar funcionários" });
+  }
 });
 
-// Cadastrar funcionário
-router.post("/", (req, res) => {
-  const { name, email, position, department, salary, payroll, benefits } = req.body;
-  const sql = `
-    INSERT INTO employees (name, email, position, department, salary, payroll, benefits)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `;
-  db.query(sql, [name, email, position, department, salary, payroll, benefits], (err, result) => {
-    if (err) return res.status(500).json({ error: err });
-    res.json({ id: result.insertId, message: "Funcionário cadastrado!" });
-  });
+// Adicionar novo funcionário
+router.post("/", async (req, res) => {
+  const { nome, cpf, cargo_id, data_admissao, salary } = req.body;
+  try {
+    const id = require("crypto").randomUUID();
+    await pool.query("INSERT INTO funcionarios (id, nome, cpf, cargo_id, data_admissao) VALUES (?, ?, ?, ?, ?)", [id, nome, cpf, cargo_id || null, data_admissao]);
+    
+    // Historico salarial
+    if (salary) {
+      const histId = require("crypto").randomUUID();
+      await pool.query("INSERT INTO historico_salarial (id, funcionario_id, salario, data_inicio) VALUES (?, ?, ?, ?)", [histId, id, salary, new Date()]);
+    }
+
+    res.json({ message: "Funcionário adicionado", id });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao adicionar funcionário" });
+  }
 });
 
-// Atualizar funcionário
-router.put("/:id", (req, res) => {
-  const { name, email, position, department, salary, payroll, benefits } = req.body;
-  const sql = `
-    UPDATE employees
-    SET name=?, email=?, position=?, department=?, salary=?, payroll=?, benefits=?
-    WHERE id=?
-  `;
-  db.query(sql, [name, email, position, department, salary, payroll, benefits, req.params.id], (err) => {
-    if (err) return res.status(500).json({ error: err });
-    res.json({ message: "Funcionário atualizado!" });
-  });
+// Editar funcionário
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { nome, cpf, cargo_id, data_admissao } = req.body;
+  try {
+    await pool.query("UPDATE funcionarios SET nome=?, cpf=?, cargo_id=?, data_admissao=? WHERE id=?", [nome, cpf, cargo_id, data_admissao, id]);
+    res.json({ message: "Funcionário atualizado" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao atualizar funcionário" });
+  }
 });
 
 // Deletar funcionário
-router.delete("/:id", (req, res) => {
-  db.query("DELETE FROM employees WHERE id=?", [req.params.id], (err) => {
-    if (err) return res.status(500).json({ error: err });
-    res.json({ message: "Funcionário removido!" });
-  });
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query("DELETE FROM funcionarios WHERE id=?", [id]);
+    res.json({ message: "Funcionário removido" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao remover funcionário" });
+  }
 });
 
 module.exports = router;

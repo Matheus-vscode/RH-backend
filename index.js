@@ -1,16 +1,17 @@
-// index.js
 const express = require("express");
 const cors = require("cors");
-
-const employeesRoutes = require("./routes/employees");
-const awayRoutes = require("./routes/away");
-
 const app = express();
+const port = 3000;
+
 app.use(cors());
 app.use(express.json());
 
-app.use("/employees", employeesRoutes);
-app.use("/away", awayRoutes);
+const employeesRouter = require("./employees");
+const awayRouter = require("./away");
 
-const PORT = 3000;
-app.listen(PORT, () => console.log(`🚀 Servidor rodando na porta ${PORT}`));
+app.use("/api/employees", employeesRouter);
+app.use("/api/away", awayRouter);
+
+app.listen(port, () => {
+  console.log(`Servidor rodando em http://localhost:${port}`);
+});

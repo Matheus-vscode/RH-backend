@@ -1,19 +1,14 @@
-// db.js
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise");
 
-const connection = mysql.createConnection({
+// Substitua pelos seus dados do DbGate / MySQL
+const pool = mysql.createPool({
   host: "localhost",
-  user: "root",       // ajuste se necessário
-  password: "123456", // ajuste se necessário
-  database: "rh_system"
+  user: "root",
+  password: "",
+  database: "rh_empresa",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
-connection.connect(err => {
-  if (err) {
-    console.error("Erro ao conectar no MySQL:", err);
-    return;
-  }
-  console.log("✅ Conectado ao MySQL!");
-});
-
-module.exports = connection;
+module.exports = pool;
