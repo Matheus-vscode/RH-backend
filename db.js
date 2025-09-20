@@ -1,8 +1,14 @@
-import mysql from "mysql2/promise";
+const mysql = require("mysql2/promise");
 
-export const db = await mysql.createPool({
+// Configuração do banco (ajuste conforme seu ambiente)
+const pool = mysql.createPool({
   host: "localhost",
   user: "root",
-  password: "1012Matheus2007", // sua senha do MySQL
-  database: "rh"
+  password: "sua_senha",
+  database: "rh_empresa",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
+
+module.exports = pool;

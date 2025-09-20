@@ -1,45 +1,43 @@
-import express from "express";
-import { db } from "../db.js";
-import { randomUUID } from "crypto";
-
+const express = require("express");
 const router = express.Router();
+const db = require("./db");
 
-// Listar todos os funcionários
+// Listar todos funcionários
 router.get("/", async (req, res) => {
-  const [rows] = await db.query("SELECT * FROM employees");
+  const [rows] = await db.query("SELECT * FROM funcionarios");
   res.json(rows);
 });
 
-// Criar funcionário (ID gerado no backend)
+// Buscar por ID
+router.get("/:id", async (req, res) => {
+  const [rows] = await db.query("SELECT * FROM funcionarios WHERE id = ?", [req.params.id]);
+  res.json(rows[0] || {});
+});
+
+// Criar novo funcionário
 router.post("/", async (req, res) => {
-  const { name, cpf, role, dept, salary, adm } = req.body;
-  const id = randomUUID(); // gera ID único
+  const { id, nome, cpf, cargo_id, data_admissao, status } = req.body;
   await db.query(
-    "INSERT INTO employees (id, name, cpf, role, dept, salary, adm) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    [id, name, cpf, role, dept, salary, adm]
+    "INSERT INTO funcionarios (id, nome, cpf, cargo_id, data_admissao, status) VALUES (?, ?, ?, ?, ?, ?)",
+    [id, nome, cpf, cargo_id, data_admissao, status || "ATIVO"]
   );
-  res.json({ id, name, cpf, role, dept, salary, adm });
+  res.json({ message: "Funcionário cadastrado com sucesso" });
 });
 
-// Atualizar funcionário
+// Atualizar
 router.put("/:id", async (req, res) => {
-  const { id } = req.params;
-  const { name, cpf, role, dept, salary, adm } = req.body;
+  const { nome, cpf, cargo_id, data_admissao, status } = req.body;
   await db.query(
-    "UPDATE employees SET name=?, cpf=?, role=?, dept=?, salary=?, adm=? WHERE id=?",
-    [name, cpf, role, dept, salary, adm, id]
+    "UPDATE funcionarios SET nome=?, cpf=?, cargo_id=?, data_admissao=?, status=? WHERE id=?",
+    [nome, cpf, cargo_id, data_admissao, status, req.params.id]
   );
-  res.json({ id, name, cpf, role, dept, salary, adm });
+  res.json({ message: "Funcionário atualizado" });
 });
 
-// Remover funcionário
+// Deletar
 router.delete("/:id", async (req, res) => {
-  const { id } = req.params;
-  await db.query("DELETE FROM employees WHERE id=?", [id]);
-  // Remover afastamentos também
-  await db.query("DELETE FROM away WHERE empId=?", [id]);
-  res.json({ success: true });
+  await db.query("DELETE FROM funcionarios WHERE id=?", [req.params.id]);
+  res.json({ message: "Funcionário removido" });
 });
 
-export default router;
-
+module.exports = router;
